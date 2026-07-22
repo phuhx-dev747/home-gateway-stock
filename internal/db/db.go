@@ -35,18 +35,21 @@ func Init(path string) error {
 }
 
 func InsertTelemetry(d models.TelemetryData) {
-	// Clean up records older than 24 hours (24 * 3600 * 1000 milliseconds)
-	cutoff := time.Now().UnixMilli() - 24*60*60*1000
-	if _, err := DB.Exec("DELETE FROM telemetry WHERE timestamp < ?", cutoff); err != nil {
-		log.Printf("db cleanup error: %v", err)
-	}
-
 	_, err := DB.Exec(
 		"INSERT INTO telemetry (timestamp, cpu, mem, temp, mem_used, mem_total) VALUES (?, ?, ?, ?, ?, ?)",
 		d.Timestamp, d.CPU, d.Mem, d.Temp, d.MemUsed, d.MemTotal,
 	)
 	if err != nil {
 		log.Printf("db insert error: %v", err)
+	}
+}
+
+// CleanupOld removes records older than 24 hours.
+// Called periodically (every 5 minutes) from telemetry goroutine.
+func CleanupOld() {
+	cutoff := time.Now().UnixMilli() - 24*60*60*1000
+	if _, err := DB.Exec("DELETE FROM telemetry WHERE timestamp < ?", cutoff); err != nil {
+		log.Printf("db cleanup error: %v", err)
 	}
 }
 

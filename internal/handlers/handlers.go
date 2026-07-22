@@ -169,6 +169,9 @@ const (
 	powerBearerToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc4QTQzNUUxQzNDQzNGMzM2RDg2MkMyN0RBRTA3NjU3IiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE3ODIwNjEzODEsImV4cCI6MTgxMzU5NzM4MSwiaXNzIjoiaHR0cHM6Ly9jc2toLWFwaS5jcGMudm4iLCJhdWQiOiJDU0tIIiwiY2xpZW50X2lkIjoiQ1NLSF9BcHAiLCJzdWIiOiIwNzk2NjcwZi01ZjUwLTk2ZjUtNzA2Yy0zYTE2Y2QzMDY5YmUiLCJhdXRoX3RpbWUiOjE3ODIwNjEzODEsImlkcCI6ImxvY2FsIiwicGhvbmVfbnVtYmVyIjoiMDM4NTE0NzgxMSIsInBob25lX251bWJlcl92ZXJpZmllZCI6IlRydWUiLCJlbWFpbCI6IjAzODUxNDc4MTFAY3BjLnZuIiwiZW1haWxfdmVyaWZpZWQiOiJGYWxzZSIsIkN1c3RvbWVyQ29kZXMiOiIiLCJuYW1lIjoiMDM4NTE0NzgxMSIsImlhdCI6MTc4MjA2MTM4MSwic2NvcGUiOlsiQ1NLSCJdLCJhbXIiOlsicHdkIl19.onYLgqTh7JJxS3n6aUWcdksVoe_C0kUkU-kRGcMvE7lV6CWDAwlMFZgioQv7NLZfv_xbAbW-VeyhORmF8OtZ3ECUPXiKlCZiksTBE9MCQja83f1dZX5BrnHO3-5lSmA_OGbtLpfGthMHmvV_HX4bNBAd2wcOIdqTVvGPnD9V3lMYBXz0aPAthUOytsLIqkyYBOETLkZi6ebAmiTdbrQ5pZ89TatzfBpl5yoLofABhHGfW2areuzGpE5juhYYtlk7_XbAYFrBZqB8iacFvN2ZEwJ0qbnhE8rMqa2o0tCQ6j7gvG-jxHuz-HhGLDgvuEC1BJ6agGaDhvTSV04plOe-ag"
 )
 
+// powerClient is reused across requests for connection pooling.
+var powerClient = &http.Client{Timeout: 10 * time.Second}
+
 // Format 1: {"statusCode":200,"data":{"alertThreshold":120,"electricUsedToday":...}}
 type cpcWrapped struct {
 	StatusCode int    `json:"statusCode"`
@@ -226,8 +229,7 @@ func PowerConsumption(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Referer", "https://cskh.cpc.vn/")
 	req.Header.Set("User-Agent", "Mozilla/5.0")
 
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
+	resp, err := powerClient.Do(req)
 	if err != nil {
 		utils.WriteError(w, "failed to fetch power data", http.StatusServiceUnavailable)
 		return

@@ -31,7 +31,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "3000"
+		port = "3001"
 	}
 	log.Printf("gateway monitor :%s", port)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
