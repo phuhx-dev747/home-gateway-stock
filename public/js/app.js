@@ -6,22 +6,24 @@ $(document).ready(function () {
   // Initialize the unified telemetry chart safely to prevent library loading errors from crashing the whole app
   let telemetryChart = null;
   let chartData = [[], [], [], []];
-  try {
-    if (typeof createTelemetryChart === 'function') {
-      telemetryChart = createTelemetryChart('telemetryChart');
-    } else {
-      throw new Error('createTelemetryChart is not defined. uPlot load may have failed.');
+
+  function initTelemetryChart() {
+    if (typeof createTelemetryChart !== 'function') {
+      $('#historyCard, #toggleHistoryCard').hide();
+      if (window.onerror) window.onerror('Telemetry Chart disabled: createTelemetryChart not defined.', 'app.js', 7);
+      return;
     }
-  } catch (err) {
-    console.error('Failed to initialize telemetry chart:', err);
-    // Hide the history card if uPlot cannot load so other cards render fine
-    $('#historyCard').hide();
-    // Hide the toggle button for history chart as well
-    $('#toggleHistoryCard').hide();
-    if (window.onerror) {
-      window.onerror('Telemetry Chart disabled: ' + err.message, 'app.js', 7);
+    try {
+      telemetryChart = createTelemetryChart('telemetryChart');
+    } catch (err) {
+      console.error('Failed to initialize telemetry chart:', err);
+      $('#historyCard, #toggleHistoryCard').hide();
+      if (window.onerror) window.onerror('Telemetry Chart disabled: ' + err.message, 'app.js', 7);
     }
   }
+
+  // Defer init to allow Tailwind CDN to compute styles before uPlot reads container dimensions
+  requestAnimationFrame(() => requestAnimationFrame(() => initTelemetryChart()));
 
   // Cache DOM element queries to improve performance and minimize DOM lookup overhead
   const $historyCard = $('#historyCard');
