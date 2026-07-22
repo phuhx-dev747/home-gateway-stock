@@ -4,33 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gateway Monitor - Dark Mode</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Gateway Monitor</title>
     <script src="/js/tailwindcss-cdn.js"></script>
-    <!-- uPlot CSS -->
     <link rel="stylesheet" href="/js/uPlot.min.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
     <style type="text/tailwindcss">
         @layer base {
             body {
-                @apply bg-[#030712] text-gray-100 antialiased;
-                font-family: 'Plus Jakarta Sans', sans-serif;
+                @apply bg-[#0a0f1a] text-gray-100 antialiased text-sm;
             }
             .font-mono {
                 font-family: 'JetBrains Mono', monospace;
             }
         }
-        /* Custom uPlot legend and grid styling for Glassmorphism */
         .uplot .u-legend {
-            @apply flex flex-wrap justify-center gap-6 text-sm font-medium mt-4 text-gray-300;
+            @apply flex flex-wrap gap-4 text-xs text-gray-400 mt-2;
         }
     </style>
-    <!-- Diagnostic script to show JavaScript errors directly on mobile screens -->
     <script>
         window.onerror = function(msg, url, line, col, error) {
             var errDiv = document.getElementById('mobile-debug-log');
@@ -61,473 +50,267 @@
     </script>
 </head>
 
-<body class="relative min-h-screen overflow-x-hidden pb-12 bg-[#030712] text-gray-100 antialiased">
-    <div
-        class="container mx-auto mt-4 sm:mt-8 p-4 sm:p-6 bg-[#090d16] rounded-2xl shadow-xl border border-gray-800/50 relative z-10">
-        <div
-            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 sm:mb-6 border-b border-white/[0.06] pb-4 sm:pb-6">
-            <div>
-                <h1
-                    class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 mb-2">
-                    Gateway System Monitor</h1>
-                <p class="text-gray-400 text-sm">Real-time system telemetry via WebSockets.</p>
-            </div>
-            <!-- Header Card Toggles -->
-            <div class="flex items-center gap-2">
-                <button id="showCmdlineBtn"
-                    class="p-2 bg-white/[0.04] hover:bg-white/[0.08] text-indigo-400 hover:text-indigo-300 rounded-xl border border-white/[0.08] shadow-lg transition-all active:scale-95 flex items-center justify-center"
-                    title="Show System Command Line">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                        </path>
-                    </svg>
+<body class="relative min-h-screen pb-6">
+    <div class="container mx-auto mt-3 p-3 bg-[#0d1320] rounded-lg border border-gray-800/50">
+        <!-- Header -->
+        <div class="flex items-center justify-between gap-3 mb-3 border-b border-gray-800/60 pb-3">
+            <h1 class="text-lg font-bold text-gray-200">Gateway Monitor</h1>
+            <div class="flex items-center gap-1.5">
+                <button id="showCmdlineBtn" class="p-1.5 text-gray-400 hover:text-indigo-400 rounded hover:bg-white/5 transition" title="Terminal">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </button>
-                <button id="toggleHistoryCard"
-                    class="p-2 bg-white/[0.04] hover:bg-white/[0.08] text-indigo-400 hover:text-indigo-300 rounded-xl border border-white/[0.08] shadow-lg transition-all active:scale-95 flex items-center justify-center"
-                    title="Toggle History Chart">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M7 12l3-3 3 3 4-4M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z">
-                        </path>
-                    </svg>
+                <button id="toggleHistoryCard" class="p-1.5 text-gray-400 hover:text-indigo-400 rounded hover:bg-white/5 transition" title="History">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                 </button>
-                <button id="toggleProcessCard"
-                    class="p-2 bg-white/[0.04] hover:bg-white/[0.08] text-indigo-400 hover:text-indigo-300 rounded-xl border border-white/[0.08] shadow-lg transition-all active:scale-95 flex items-center justify-center"
-                    title="Toggle Processes List">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
+                <button id="toggleProcessCard" class="p-1.5 text-gray-400 hover:text-indigo-400 rounded hover:bg-white/5 transition" title="Processes">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
-                <button id="togglePM2Card"
-                    class="p-2 bg-white/[0.04] hover:bg-white/[0.08] text-indigo-400 hover:text-indigo-300 rounded-xl border border-white/[0.08] shadow-lg transition-all active:scale-95 flex items-center justify-center"
-                    title="Toggle PM2 Manager">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                        </path>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
-                        </path>
-                    </svg>
+                <button id="togglePM2Card" class="p-1.5 text-gray-400 hover:text-indigo-400 rounded hover:bg-white/5 transition" title="PM2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </button>
-                <button id="toggleDockerCard"
-                    class="p-2 bg-white/[0.04] hover:bg-white/[0.08] text-indigo-400 hover:text-indigo-300 rounded-xl border border-white/[0.08] shadow-lg transition-all active:scale-95 flex items-center justify-center"
-                    title="Toggle Docker Manager">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                        </path>
-                    </svg>
+                <button id="toggleDockerCard" class="p-1.5 text-gray-400 hover:text-indigo-400 rounded hover:bg-white/5 transition" title="Docker">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                 </button>
-                <button id="togglePowerCard"
-                    class="p-2 bg-white/[0.04] hover:bg-white/[0.08] text-indigo-400 hover:text-indigo-300 rounded-xl border border-white/[0.08] shadow-lg transition-all active:scale-95 flex items-center justify-center"
-                    title="Toggle Power Consumption">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
+                <button id="togglePowerCard" class="p-1.5 text-gray-400 hover:text-indigo-400 rounded hover:bg-white/5 transition" title="Power">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 </button>
             </div>
         </div>
 
-        <!-- Main Grid for all 5 Cards/Sections -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-8">
-            <!-- 1. 3 KPI Cards -->
-            <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
-                <!-- CPU Load Card -->
-                <div
-                    class="telemetry-card bg-[#111827] p-4 sm:p-5 rounded-2xl border border-gray-800/60 shadow-lg flex flex-col justify-between transition-all duration-300">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-gray-400">CPU Load</span>
-                        <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                    </div>
-                    <div class="mt-2 sm:mt-4 flex items-baseline">
-                        <span id="cpuValue" class="text-2xl sm:text-3xl font-extrabold text-gray-100 font-mono">--</span>
-                        <span class="ml-1 text-sm text-gray-400">%</span>
+        <!-- Content Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+            <!-- KPI Row -->
+            <div class="sm:col-span-2 grid grid-cols-3 gap-2">
+                <div class="bg-[#111827] p-3 rounded-lg border border-gray-800/50">
+                    <span class="text-xs text-gray-500 uppercase tracking-wide">CPU</span>
+                    <div class="mt-1 flex items-baseline">
+                        <span id="cpuValue" class="text-2xl font-bold text-gray-100 font-mono">--</span>
+                        <span class="ml-1 text-xs text-gray-500">%</span>
                     </div>
                 </div>
-                <!-- RAM Usage Card -->
-                <div
-                    class="telemetry-card bg-[#111827] p-4 sm:p-5 rounded-2xl border border-gray-800/60 shadow-lg flex flex-col justify-between transition-all duration-300">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-gray-400">RAM Usage</span>
-                        <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                    </div>
-                    <div class="mt-2 sm:mt-4 flex items-baseline">
-                        <span id="ramValue" class="text-xl sm:text-2xl font-extrabold text-gray-100 font-mono">--</span>
+                <div class="bg-[#111827] p-3 rounded-lg border border-gray-800/50">
+                    <span class="text-xs text-gray-500 uppercase tracking-wide">RAM</span>
+                    <div class="mt-1 flex items-baseline">
+                        <span id="ramValue" class="text-xl font-bold text-gray-100 font-mono">--</span>
                     </div>
                 </div>
-                <!-- CPU Temperature Card -->
-                <div
-                    class="telemetry-card bg-[#111827] p-4 sm:p-5 rounded-2xl border border-gray-800/60 shadow-lg flex flex-col justify-between transition-all duration-300">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-gray-400">CPU Temperature</span>
-                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                    </div>
-                    <div class="mt-2 sm:mt-4 flex items-baseline">
-                        <span id="tempValue" class="text-2xl sm:text-3xl font-extrabold text-gray-100 font-mono">--</span>
-                        <span class="ml-1 text-sm text-gray-400">°C</span>
+                <div class="bg-[#111827] p-3 rounded-lg border border-gray-800/50">
+                    <span class="text-xs text-gray-500 uppercase tracking-wide">Temp</span>
+                    <div class="mt-1 flex items-baseline">
+                        <span id="tempValue" class="text-2xl font-bold text-gray-100 font-mono">--</span>
+                        <span class="ml-1 text-xs text-gray-500">°C</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Unified History Chart Card -->
-            <div id="historyCard"
-                class="sm:col-span-2 bg-[#111827] p-4 sm:p-6 rounded-2xl border border-gray-800/60 shadow-lg flex flex-col transition-all duration-300">
-                <div
-                    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 border-b border-white/[0.06] pb-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-100">Gateway Telemetry History</h2>
-                        <p class="text-gray-400 text-xs mt-1">Unified history for CPU, RAM, and Temperature.</p>
-                    </div>
-                    <div
-                        class="flex items-center gap-1.5 bg-white/[0.03] p-1 rounded-xl border border-white/[0.08] self-stretch sm:self-auto justify-between">
-                        <button data-range="15m"
-                            class="range-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-gray-400 hover:text-white border border-transparent">15m</button>
-                        <button data-range="30m"
-                            class="range-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-gray-400 hover:text-white border border-transparent">30m</button>
-                        <button data-range="1h"
-                            class="range-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.15)]">1h</button>
-                        <button data-range="4h"
-                            class="range-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-gray-400 hover:text-white border border-transparent">4h</button>
-                        <button data-range="24h"
-                            class="range-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-gray-400 hover:text-white border border-transparent">24h</button>
+            <!-- History Chart -->
+            <div id="historyCard" class="sm:col-span-2 bg-[#111827] p-3 rounded-lg border border-gray-800/50">
+                <div class="flex items-center justify-between gap-3 mb-2">
+                    <h2 class="text-sm font-semibold text-gray-200">Telemetry History</h2>
+                    <div class="flex gap-1 bg-white/[0.03] p-0.5 rounded-md border border-white/[0.06]">
+                        <button data-range="15m" class="range-btn px-2 py-0.5 text-[10px] font-semibold rounded transition text-gray-500 hover:text-white">15m</button>
+                        <button data-range="30m" class="range-btn px-2 py-0.5 text-[10px] font-semibold rounded transition text-gray-500 hover:text-white">30m</button>
+                        <button data-range="1h" class="range-btn px-2 py-0.5 text-[10px] font-semibold rounded transition bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">1h</button>
+                        <button data-range="4h" class="range-btn px-2 py-0.5 text-[10px] font-semibold rounded transition text-gray-500 hover:text-white">4h</button>
+                        <button data-range="24h" class="range-btn px-2 py-0.5 text-[10px] font-semibold rounded transition text-gray-500 hover:text-white">24h</button>
                     </div>
                 </div>
-                <div id="chartContainer" class="relative w-full h-[180px] sm:h-[250px] min-h-[180px] sm:min-h-[250px] transition-all duration-300">
+                <div id="chartContainer" class="w-full h-[160px] min-h-[160px]">
                     <div id="telemetryChart" class="w-full h-full"></div>
                 </div>
             </div>
 
-            <!-- Processes Card -->
-            <div id="processCard"
-                class="sm:col-span-1 bg-[#111827] p-4 sm:p-6 rounded-2xl border border-gray-800/60 shadow-lg transition-all duration-300">
-                <div
-                    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 border-b border-white/[0.06] pb-4">
-                    <div>
-                        <h2 id="processCardTitle" class="text-lg sm:text-xl font-bold text-gray-100">Top RAM Consuming Processes
-                        </h2>
-                        <p class="text-gray-400 text-xs mt-1">Real-time resource-intensive processes on the gateway.</p>
-                    </div>
-                    <div
-                        class="flex items-center gap-1.5 bg-white/[0.03] p-1 rounded-xl border border-white/[0.08] self-stretch sm:self-auto justify-between">
-                        <button data-mode="ram"
-                            class="process-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition-all bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.15)]">RAM
-                            Usage</button>
-                        <button data-mode="cpu"
-                            class="process-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-gray-400 hover:text-white border border-transparent">CPU
-                            Usage</button>
+            <!-- Processes -->
+            <div id="processCard" class="sm:col-span-1 bg-[#111827] p-3 rounded-lg border border-gray-800/50">
+                <div class="flex items-center justify-between gap-3 mb-2">
+                    <h2 id="processCardTitle" class="text-sm font-semibold text-gray-200">Top Processes (RAM)</h2>
+                    <div class="flex gap-1 bg-white/[0.03] p-0.5 rounded-md border border-white/[0.06]">
+                        <button data-mode="ram" class="process-btn px-2 py-0.5 text-[10px] font-semibold rounded transition bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">RAM</button>
+                        <button data-mode="cpu" class="process-btn px-2 py-0.5 text-[10px] font-semibold rounded transition text-gray-500 hover:text-white">CPU</button>
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-white/[0.06]">
+                    <table class="min-w-full divide-y divide-gray-800/60 text-xs">
                         <thead>
-                            <tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">PID</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">Process Name</th>
-                                <th id="processMetricHeader" class="px-2 sm:px-4 py-1.5 sm:py-2 text-right">Memory (%)</th>
+                            <tr class="text-left text-[10px] font-semibold text-gray-500 uppercase">
+                                <th class="px-2 py-1">PID</th>
+                                <th class="px-2 py-1">Name</th>
+                                <th id="processMetricHeader" class="px-2 py-1 text-right">Memory %</th>
                             </tr>
                         </thead>
-                        <tbody id="processTableBody" class="divide-y divide-white/[0.04] text-sm text-gray-300">
-                        </tbody>
+                        <tbody id="processTableBody" class="divide-y divide-gray-800/40 text-gray-300"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- PM2 Processes Manager Card -->
-            <div id="pm2Card"
-                class="lg:col-span-1 bg-[#111827] p-6 rounded-2xl border border-gray-800/60 shadow-lg transition-all duration-300">
-                <div
-                    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b border-white/[0.06] pb-6">
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-100">PM2 Process Manager</h2>
-                        <p class="text-gray-400 text-xs mt-1">Manage Node.js services and backend background processes.
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex items-center bg-black/40 border border-white/[0.08] rounded-xl px-3 py-1.5 font-mono text-xs focus-within:border-indigo-500/50 transition-all">
-                            <input type="text" id="pm2StartInput"
-                                class="w-48 bg-transparent border-none outline-none text-gray-100 placeholder-gray-600"
-                                placeholder="Start new (e.g. app.js)" autocomplete="off">
-                        </div>
-                        <button id="pm2StartBtn"
-                            class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-semibold transition-all active:scale-95">Start</button>
-                        <button id="pm2RefreshBtn"
-                            class="p-2 bg-white/[0.04] hover:bg-white/[0.08] text-gray-300 rounded-xl border border-white/[0.08] transition-all active:scale-95"
-                            title="Refresh PM2 list">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.25"></path>
-                            </svg>
+            <!-- PM2 -->
+            <div id="pm2Card" class="sm:col-span-1 bg-[#111827] p-3 rounded-lg border border-gray-800/50">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <h2 class="text-sm font-semibold text-gray-200">PM2</h2>
+                    <div class="flex items-center gap-1.5">
+                        <input type="text" id="pm2StartInput" class="w-32 bg-black/40 border border-gray-800/60 rounded px-2 py-0.5 font-mono text-[11px] text-gray-100 placeholder-gray-600 outline-none focus:border-indigo-500/50" placeholder="Start (e.g. app.js)" autocomplete="off">
+                        <button id="pm2StartBtn" class="px-2 py-0.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded text-[10px] font-semibold transition">Go</button>
+                        <button id="pm2RefreshBtn" class="p-1 text-gray-500 hover:text-gray-300 transition" title="Refresh">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.25"/></svg>
                         </button>
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-white/[0.06]">
+                    <table class="min-w-full divide-y divide-gray-800/60 text-xs">
                         <thead>
-                            <tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">PMID</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">Name</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">Status</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2 text-right">Restarts</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2 text-right">CPU</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2 text-right">Memory</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2 text-right">Actions</th>
+                            <tr class="text-left text-[10px] font-semibold text-gray-500 uppercase">
+                                <th class="px-2 py-1">ID</th>
+                                <th class="px-2 py-1">Name</th>
+                                <th class="px-2 py-1">Status</th>
+                                <th class="px-2 py-1 text-right">Restarts</th>
+                                <th class="px-2 py-1 text-right">CPU</th>
+                                <th class="px-2 py-1 text-right">Mem</th>
+                                <th class="px-2 py-1 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="pm2TableBody" class="divide-y divide-white/[0.04] text-sm text-gray-300">
-                            <tr>
-                                <td colspan="7" class="px-4 py-8 text-center text-gray-500 font-medium">Loading PM2
-                                    processes...</td>
-                            </tr>
+                        <tbody id="pm2TableBody" class="divide-y divide-gray-800/40 text-gray-300">
+                            <tr><td colspan="7" class="px-3 py-6 text-center text-gray-600 text-xs">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Power Consumption Card -->
-            <div id="powerCard"
-                class="sm:col-span-2 bg-[#111827] p-4 sm:p-6 rounded-2xl border border-gray-800/60 shadow-lg transition-all duration-300">
-                <div
-                    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 border-b border-white/[0.06] pb-4">
-                    <div>
-                        <h2 class="text-lg sm:text-xl font-bold text-gray-100 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z">
-                                </path>
-                            </svg>
-                            Power Consumption
-                        </h2>
-                        <p class="text-gray-400 text-xs mt-1">Electricity telemetry for customer PC12CC0501048.</p>
-                    </div>
+            <!-- Power -->
+            <div id="powerCard" class="sm:col-span-2 bg-[#111827] p-3 rounded-lg border border-gray-800/50">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <h2 class="text-sm font-semibold text-gray-200 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        Power
+                    </h2>
                     <div class="flex items-center gap-2">
-                        <span id="powerStatusBadge"
-                            class="px-2 py-1 text-xs font-semibold rounded-full bg-green-500/20 text-green-300 border border-green-500/30">active</span>
-                        <button id="powerRefreshBtn"
-                            class="p-2 bg-white/[0.04] hover:bg-white/[0.08] text-gray-300 rounded-xl border border-white/[0.08] transition-all active:scale-95 flex items-center justify-center"
-                            title="Refresh data">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.25"></path>
-                            </svg>
+                        <span id="powerStatusBadge" class="px-1.5 py-0.5 text-[10px] font-semibold rounded-full bg-green-500/20 text-green-300 border border-green-500/30">active</span>
+                        <button id="powerRefreshBtn" class="p-1 text-gray-500 hover:text-gray-300 transition" title="Refresh">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.25"/></svg>
                         </button>
                     </div>
                 </div>
-
-                <!-- Stats Grid (3x2 Horizontal Layout) -->
-                <div class="grid grid-cols-3 gap-2.5 sm:gap-4 text-sm mb-4 sm:mb-6">
-                    <!-- Today -->
-                    <div class="bg-white/[0.01] border border-white/[0.04] p-2 sm:p-3 rounded-xl">
-                        <div class="text-gray-400 text-xs font-medium">Today</div>
-                        <div id="powerToday" class="text-sm sm:text-base md:text-lg font-bold text-gray-100 mt-1 font-mono">-- <span
-                                class="text-[10px] sm:text-xs text-gray-400 font-normal">kWh</span></div>
+                <div class="grid grid-cols-3 gap-2 text-xs mb-3">
+                    <div class="bg-white/[0.02] border border-white/[0.04] px-2.5 py-1.5 rounded">
+                        <div class="text-[10px] text-gray-500">Today</div>
+                        <div id="powerToday" class="text-sm font-bold text-gray-100 font-mono mt-0.5">-- <span class="text-[10px] text-gray-500 font-normal">kWh</span></div>
                     </div>
-                    <!-- Today's Avg/Hour -->
-                    <div class="bg-white/[0.01] border border-white/[0.04] p-2 sm:p-3 rounded-xl">
-                        <div class="text-gray-400 text-xs font-medium">Today's Avg/Hour</div>
-                        <div id="powerTodayAvg" class="text-sm sm:text-base md:text-lg font-bold text-gray-100 mt-1 font-mono">-- <span
-                                class="text-[10px] sm:text-xs text-gray-400 font-normal">kWh/h</span></div>
+                    <div class="bg-white/[0.02] border border-white/[0.04] px-2.5 py-1.5 rounded">
+                        <div class="text-[10px] text-gray-500">Avg/Hour</div>
+                        <div id="powerTodayAvg" class="text-sm font-bold text-gray-100 font-mono mt-0.5">-- <span class="text-[10px] text-gray-500 font-normal">kWh/h</span></div>
                     </div>
-                    <!-- This Month -->
-                    <div class="bg-white/[0.01] border border-white/[0.04] p-2 sm:p-3 rounded-xl">
-                        <div class="text-gray-400 text-xs font-medium">This Month</div>
-                        <div id="powerThisMonth" class="text-sm sm:text-base md:text-lg font-bold text-indigo-400 mt-1 font-mono">-- <span
-                                class="text-[10px] sm:text-xs text-gray-400 font-normal">kWh</span></div>
+                    <div class="bg-white/[0.02] border border-white/[0.04] px-2.5 py-1.5 rounded">
+                        <div class="text-[10px] text-gray-500">This Month</div>
+                        <div id="powerThisMonth" class="text-sm font-bold text-indigo-400 font-mono mt-0.5">-- <span class="text-[10px] text-gray-500 font-normal">kWh</span></div>
                     </div>
-                    <!-- Yesterday -->
-                    <div class="bg-white/[0.01] border border-white/[0.04] p-2 sm:p-3 rounded-xl">
-                        <div class="text-gray-400 text-xs font-medium">Yesterday</div>
-                        <div id="powerYesterday" class="text-sm sm:text-base md:text-lg font-bold text-gray-100 mt-1 font-mono">-- <span
-                                class="text-[10px] sm:text-xs text-gray-400 font-normal">kWh</span></div>
+                    <div class="bg-white/[0.02] border border-white/[0.04] px-2.5 py-1.5 rounded">
+                        <div class="text-[10px] text-gray-500">Yesterday</div>
+                        <div id="powerYesterday" class="text-sm font-bold text-gray-100 font-mono mt-0.5">-- <span class="text-[10px] text-gray-500 font-normal">kWh</span></div>
                     </div>
-                    <!-- Yesterday's Avg/Hour -->
-                    <div class="bg-white/[0.01] border border-white/[0.04] p-2 sm:p-3 rounded-xl">
-                        <div class="text-gray-400 text-xs font-medium">Yesterday's Avg/Hour</div>
-                        <div id="powerYesterdayAvg" class="text-sm sm:text-base md:text-lg font-bold text-gray-100 mt-1 font-mono">-- <span
-                                class="text-[10px] sm:text-xs text-gray-400 font-normal">kWh/h</span></div>
+                    <div class="bg-white/[0.02] border border-white/[0.04] px-2.5 py-1.5 rounded">
+                        <div class="text-[10px] text-gray-500">Yesterday Avg/H</div>
+                        <div id="powerYesterdayAvg" class="text-sm font-bold text-gray-100 font-mono mt-0.5">-- <span class="text-[10px] text-gray-500 font-normal">kWh/h</span></div>
                     </div>
-                    <!-- Last Month -->
-                    <div class="bg-white/[0.01] border border-white/[0.04] p-2 sm:p-3 rounded-xl">
-                        <div class="text-gray-400 text-xs font-medium">Last Month</div>
-                        <div id="powerLastMonth" class="text-sm sm:text-base md:text-lg font-bold text-gray-100 mt-1 font-mono">-- <span
-                                class="text-[10px] sm:text-xs text-gray-400 font-normal">kWh</span></div>
+                    <div class="bg-white/[0.02] border border-white/[0.04] px-2.5 py-1.5 rounded">
+                        <div class="text-[10px] text-gray-500">Last Month</div>
+                        <div id="powerLastMonth" class="text-sm font-bold text-gray-100 font-mono mt-0.5">-- <span class="text-[10px] text-gray-500 font-normal">kWh</span></div>
                     </div>
                 </div>
-
-                <!-- Threshold Info and Progress Bar -->
-                <div class="border-t border-white/[0.06] pt-3 sm:pt-4">
-                    <div class="flex justify-between items-center text-xs text-gray-400 mb-2">
-                        <span>Monthly Alert Threshold</span>
-                        <span id="powerThresholdText" class="font-mono text-gray-200">-- / -- kWh (--%)</span>
+                <div class="border-t border-gray-800/60 pt-2">
+                    <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+                        <span>Monthly Threshold</span>
+                        <span id="powerThresholdText" class="font-mono text-gray-300">-- / -- kWh (--%)</span>
                     </div>
-                    <div
-                        class="w-full bg-white/[0.03] border border-white/[0.08] h-3 rounded-full overflow-hidden p-[1px]">
-                        <div id="powerProgressBar"
-                            class="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500"
-                            style="width: 0%"></div>
+                    <div class="w-full bg-white/[0.03] border border-white/[0.06] h-2 rounded-full overflow-hidden">
+                        <div id="powerProgressBar" class="h-full rounded-full bg-indigo-500 transition-all duration-500" style="width: 0%"></div>
                     </div>
-                    <div class="flex justify-between text-[11px] text-gray-500 mt-2 font-mono">
+                    <div class="flex justify-between text-[10px] text-gray-600 mt-1 font-mono">
                         <span id="powerThresholdDay">Daily limit: -- kWh</span>
-                        <span id="powerLastUpdated">Refreshed: --</span>
+                        <span id="powerLastUpdated">Updated: --</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Docker Manager Card -->
-            <div id="dockerCard"
-                class="sm:col-span-2 bg-[#111827] p-4 sm:p-6 rounded-2xl border border-gray-800/60 shadow-lg transition-all duration-300">
-                <div
-                    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 border-b border-white/[0.06] pb-4">
-                    <div>
-                        <h2 class="text-lg sm:text-xl font-bold text-gray-100 flex items-center gap-2">
-                            Docker Manager
-                        </h2>
-                        <p class="text-gray-400 text-xs mt-1">Monitor and control containers and images.</p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <!-- Segmented control tabs -->
-                        <div
-                            class="flex items-center gap-1.5 bg-white/[0.03] p-1 rounded-xl border border-white/[0.08]">
-                            <button data-docker-mode="containers" id="dockerContainersTabBtn"
-                                class="docker-tab-btn px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-all bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.15)]">
-                                Containers
-                            </button>
-                            <button data-docker-mode="images" id="dockerImagesTabBtn"
-                                class="docker-tab-btn px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-all text-gray-400 hover:text-white border border-transparent">
-                                Images
-                            </button>
+            <!-- Docker -->
+            <div id="dockerCard" class="sm:col-span-2 bg-[#111827] p-3 rounded-lg border border-gray-800/50">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <h2 class="text-sm font-semibold text-gray-200">Docker</h2>
+                    <div class="flex items-center gap-2">
+                        <div class="flex gap-1 bg-white/[0.03] p-0.5 rounded-md border border-white/[0.06]">
+                            <button data-docker-mode="containers" id="dockerContainersTabBtn" class="docker-tab-btn px-2 py-0.5 text-[10px] font-semibold rounded transition bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Containers</button>
+                            <button data-docker-mode="images" id="dockerImagesTabBtn" class="docker-tab-btn px-2 py-0.5 text-[10px] font-semibold rounded transition text-gray-500 hover:text-white">Images</button>
                         </div>
-
-                        <!-- Docker image run input (only visible in images tab) -->
-                        <div id="dockerRunWrapper" class="hidden flex items-center gap-2">
-                            <div
-                                class="flex items-center bg-black/40 border border-white/[0.08] rounded-xl px-3 py-1.5 font-mono text-xs focus-within:border-indigo-500/50 transition-all">
-                                <input type="text" id="dockerRunInput"
-                                    class="w-48 bg-transparent border-none outline-none text-gray-100 placeholder-gray-600"
-                                    placeholder="Run image (e.g. nginx)" autocomplete="off">
-                            </div>
-                            <button id="dockerRunBtn"
-                                class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-semibold transition-all active:scale-95">Run</button>
+                        <div id="dockerRunWrapper" class="hidden flex items-center gap-1.5">
+                            <input type="text" id="dockerRunInput" class="w-32 bg-black/40 border border-gray-800/60 rounded px-2 py-0.5 font-mono text-[11px] text-gray-100 placeholder-gray-600 outline-none focus:border-indigo-500/50" placeholder="Run image" autocomplete="off">
+                            <button id="dockerRunBtn" class="px-2 py-0.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded text-[10px] font-semibold transition">Go</button>
                         </div>
-
-                        <button id="dockerRefreshBtn"
-                            class="p-2 bg-white/[0.04] hover:bg-white/[0.08] text-gray-300 rounded-xl border border-white/[0.08] transition-all active:scale-95"
-                            title="Refresh Docker lists">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.25"></path>
-                            </svg>
+                        <button id="dockerRefreshBtn" class="p-1 text-gray-500 hover:text-gray-300 transition" title="Refresh">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.25"/></svg>
                         </button>
                     </div>
                 </div>
-
-                <!-- Containers View -->
                 <div id="dockerContainersView" class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-white/[0.06]">
+                    <table class="min-w-full divide-y divide-gray-800/60 text-xs">
                         <thead>
-                            <tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">Container ID</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">Name</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">Image</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">Status</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">Ports</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2 text-right">Actions</th>
+                            <tr class="text-left text-[10px] font-semibold text-gray-500 uppercase">
+                                <th class="px-2 py-1">ID</th>
+                                <th class="px-2 py-1">Name</th>
+                                <th class="px-2 py-1">Image</th>
+                                <th class="px-2 py-1">Status</th>
+                                <th class="px-2 py-1">Ports</th>
+                                <th class="px-2 py-1 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="dockerContainersTableBody"
-                            class="divide-y divide-white/[0.04] text-sm text-gray-300">
-                            <tr>
-                                <td colspan="6" class="px-2 sm:px-4 py-8 text-center text-gray-500 font-medium">Loading Docker
-                                    containers...</td>
-                            </tr>
+                        <tbody id="dockerContainersTableBody" class="divide-y divide-gray-800/40 text-gray-300">
+                            <tr><td colspan="6" class="px-3 py-6 text-center text-gray-600 text-xs">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
-
-                <!-- Images View (initially hidden) -->
                 <div id="dockerImagesView" class="overflow-x-auto hidden">
-                    <table class="min-w-full divide-y divide-white/[0.06]">
+                    <table class="min-w-full divide-y divide-gray-800/60 text-xs">
                         <thead>
-                            <tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">Image ID</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">Repository</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">Tag</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2">Created</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2 text-right">Size</th>
-                                <th class="px-2 sm:px-4 py-1.5 sm:py-2 text-right">Actions</th>
+                            <tr class="text-left text-[10px] font-semibold text-gray-500 uppercase">
+                                <th class="px-2 py-1">ID</th>
+                                <th class="px-2 py-1">Repo</th>
+                                <th class="px-2 py-1">Tag</th>
+                                <th class="px-2 py-1">Created</th>
+                                <th class="px-2 py-1 text-right">Size</th>
+                                <th class="px-2 py-1 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="dockerImagesTableBody" class="divide-y divide-white/[0.04] text-sm text-gray-300">
-                            <tr>
-                                <td colspan="6" class="px-4 py-8 text-center text-gray-500 font-medium">Loading Docker
-                                    images...</td>
-                            </tr>
+                        <tbody id="dockerImagesTableBody" class="divide-y divide-gray-800/40 text-gray-300">
+                            <tr><td colspan="6" class="px-3 py-6 text-center text-gray-600 text-xs">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <!-- Modal for Command Line Terminal Execution -->
-    <div id="terminalModal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 hidden opacity-0 transition-all duration-300">
-        <div
-            class="bg-[#0f172a] border border-gray-800 rounded-2xl p-6 max-w-5xl w-full shadow-2xl transition-all duration-300 scale-95 transform flex flex-col h-[550px]">
-            <div class="flex justify-between items-center border-b border-white/[0.06] pb-4 mb-4">
-                <h3 class="text-xl font-bold text-gray-100 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-indigo-400 animate-pulse" fill="none" stroke="currentColor"
-                        stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                        </path>
-                    </svg>
-                    Gateway Shell Terminal
-                </h3>
+    <!-- Terminal Modal -->
+    <div id="terminalModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 hidden opacity-0 transition-all duration-300">
+        <div class="bg-[#0f172a] border border-gray-800 rounded-lg p-4 max-w-4xl w-full shadow-2xl scale-95 transform flex flex-col h-[450px]">
+            <div class="flex justify-between items-center border-b border-gray-800/60 pb-2 mb-2">
+                <h3 class="text-sm font-bold text-gray-200">Terminal</h3>
             </div>
-
-            <!-- Terminal Output console -->
-            <div id="terminalConsole"
-                class="flex-grow bg-black/60 border border-white/[0.04] p-4 rounded-xl font-mono text-sm text-green-400 overflow-y-auto mb-4 select-text leading-relaxed">
-                <div class="text-gray-500 mb-2"># Gateway shell environment initialized. Type commands and press Enter.
-                </div>
+            <div id="terminalConsole" class="flex-grow bg-black/60 border border-gray-800/40 p-3 rounded font-mono text-xs text-green-400 overflow-y-auto mb-3 select-text leading-relaxed">
+                <div class="text-gray-500 mb-1"># Ready. Type command + Enter.</div>
             </div>
-
-            <!-- Terminal Input line -->
-            <div class="flex gap-3">
-                <div
-                    class="flex-grow flex items-center bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2 font-mono text-sm focus-within:border-indigo-500/50 transition-all">
+            <div class="flex gap-2">
+                <div class="flex-grow flex items-center bg-black/40 border border-gray-800/60 rounded px-3 py-1.5 font-mono text-xs focus-within:border-indigo-500/50 transition">
                     <span class="text-indigo-400 mr-2 select-none">$</span>
-                    <input type="text" id="terminalInput"
-                        class="w-full bg-transparent border-none outline-none text-gray-100 placeholder-gray-600"
-                        placeholder="Type a command (e.g. ls, df -h, uname -a)" autocomplete="off">
+                    <input type="text" id="terminalInput" class="w-full bg-transparent border-none outline-none text-gray-100 placeholder-gray-600" placeholder="command" autocomplete="off">
                 </div>
-                <button id="runTerminalBtn"
-                    class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg transition-all active:scale-95 text-sm font-semibold flex items-center gap-2">
-                    <span id="runTerminalText">Execute</span>
+                <button id="runTerminalBtn" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-xs font-semibold transition flex items-center gap-1">
+                    <span id="runTerminalText">Run</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- uPlot -->
     <script src="/js/uPlot.iife.min.js"></script>
-    <!-- jQuery -->
     <script src="/js/jquery-3.7.1.min.js"></script>
-    <!-- Custom Scripts -->
-    <script src="/js/charts.js?v=5"></script>
-    <script src="/js/app.js?v=5"></script>
+    <script src="/js/charts.js?v=6"></script>
+    <script src="/js/app.js?v=6"></script>
 </body>
 
 </html>
